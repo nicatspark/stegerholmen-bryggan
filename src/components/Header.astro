@@ -1,13 +1,16 @@
 ---
 import HeaderLink from './HeaderLink.astro'
 import { SITE_TITLE } from '../config'
+import sheeticon from '../assets/google-sheets-icon.svg'
 ---
 
 <header>
   <div>
-    <h2>
-      {SITE_TITLE}
-    </h2>
+    <div class='logo'
+      ><img src={sheeticon} alt='Google Sheet Icon' /><h2>
+        {SITE_TITLE.split(' ')[0]}
+      </h2></div
+    >
     <nav>
       <HeaderLink href='/'>Home</HeaderLink>
       <HeaderLink href='/blog'>Blog</HeaderLink>
@@ -28,6 +31,19 @@ import { SITE_TITLE } from '../config'
     & > div {
       padding-inline: var(--main-padding);
       height: 100%;
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        img {
+          width: 30px;
+        }
+        h2 {
+          text-transform: uppercase;
+          color: #31a363;
+          text-shadow: 2px 2px 2px hsl(0 0 0 / 0.3);
+        }
+      }
     }
   }
   h2 {
