@@ -7,13 +7,28 @@ import {
   QueryClientProvider,
 } from '@tanstack/react-query'
 
+const toCurrency = <T extends unknown>(
+  n: T,
+  curr: string,
+  LanguageFormat = undefined
+): T | string => {
+  if (typeof n === 'number' && isFinite(n)) {
+    return Intl.NumberFormat(LanguageFormat, {
+      style: 'currency',
+      currency: curr,
+    }).format(n)
+  }
+  return n
+}
+
 // https://docs.google.com/spreadsheets/d/16yvhnB75FaIQeGL6Su2317ub2EbF-XondlGCzqTg06I/edit?usp=sharing
 const fetchSheetUrl =
   'https://docs.google.com/spreadsheets/d/16yvhnB75FaIQeGL6Su2317ub2EbF-XondlGCzqTg06I/gviz/tq?'
+const query = encodeURIComponent('Select A,B,C,D,E,H')
 
 const regex = /[^\{]+(.+)[^\{]+/
 const getUsers = (): Promise<void | RootObject> =>
-  fetch(fetchSheetUrl)
+  fetch(`${fetchSheetUrl}&tq=${query}`)
     .then((res) => res.text())
     .then((res) => {
       const stripGarbage = res.match(regex)
@@ -59,7 +74,7 @@ export const Users = () => {
           {spots.map((row, y) => (
             <tr key={y}>
               {row.c?.map((rowC, g) => (
-                <td key={g}>{rowC?.v || ''}</td>
+                <td key={g}>{toCurrency(rowC?.v || '', 'SEK')}</td>
               ))}
             </tr>
           ))}
