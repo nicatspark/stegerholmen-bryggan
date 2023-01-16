@@ -6,20 +6,11 @@ import {
   QueryClient,
   QueryClientProvider,
 } from '@tanstack/react-query'
-
-const toCurrency = <T extends unknown>(
-  n: T,
-  curr: string,
-  LanguageFormat = undefined
-): T | string => {
-  if (typeof n === 'number' && isFinite(n)) {
-    return Intl.NumberFormat(LanguageFormat, {
-      style: 'currency',
-      currency: curr,
-    }).format(n)
-  }
-  return n
-}
+import {
+  normalizeData,
+  GoogleSheet,
+  NormalizedData,
+} from '../helpers/normalizeData'
 
 // https://docs.google.com/spreadsheets/d/16yvhnB75FaIQeGL6Su2317ub2EbF-XondlGCzqTg06I/edit?usp=sharing
 const fetchSheetUrl =
@@ -27,7 +18,8 @@ const fetchSheetUrl =
 const query = encodeURIComponent('Select A,B,C,D,E,H limit 17')
 
 const regex = /[^\{]+(.+)[^\{]+/
-const getUsers = (): Promise<void | RootObject> =>
+
+const getUsers = (): Promise<void | GoogleSheet> =>
   fetch(`${fetchSheetUrl}&tq=${query}`)
     .then((res) => res.text())
     .then((res) => {
@@ -47,6 +39,7 @@ export const App = () => {
 }
 
 export const Users = () => {
+  const [users, setUsers] = useState<NormalizedData | undefined>()
   const queryClient = useQueryClient()
 
   const { data, isLoading } = useQuery({
@@ -54,21 +47,34 @@ export const Users = () => {
     queryFn: getUsers,
   })
 
+  useEffect(() => {
+    if (!data) return
+    const normalizedData = normalizeData(data)
+    setUsers(normalizedData)
+    console.log('normalized data', normalizedData)
+  }, [data])
+
   if (isLoading) return <div>Loading spreadsheet...</div>
   return (
     <div>
       <table>
         <tbody>
           <tr>
-            {data?.table.cols.map((header, i) => (
-              <th key={i}>{header.label}</th>
-            ))}
+            <th>Nr</th>
+            <th>Name</th>
+            <th>Tel</th>
+            <th>Rent</th>
           </tr>
-          {data?.table.rows.map((row, y) => (
-            <tr key={y}>
-              {row.c?.map((rowC, g) => (
-                <td key={g}>{toCurrency(rowC?.v || '', 'SEK')}</td>
-              ))}
+          {users?.users.map((user) => (
+            <tr key={user.batplnr}>
+              <td>{user.batplnr}</td>
+              <td>
+                <a href={`mailto:${user.email}`}>
+                  {user.namn} {user.efternamn}
+                </a>
+              </td>
+              <td>{user.mobil}</td>
+              <td>{user.hyra}</td>
             </tr>
           ))}
         </tbody>
@@ -78,33 +84,3 @@ export const Users = () => {
 }
 
 /* --------------------------------- */
-
-interface RootObject {
-  version: string
-  reqId: string
-  status: string
-  sig: string
-  table: Table
-}
-
-interface Table {
-  cols: Col[]
-  rows: Row[]
-  parsedNumHeaders: number
-}
-
-interface Row {
-  c?: C[]
-}
-
-interface C {
-  v: (null | number | string)[]
-  f?: string
-}
-
-interface Col {
-  id: string
-  label: string
-  type: string
-  pattern?: string
-}
