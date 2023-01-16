@@ -1,4 +1,5 @@
 @import '/css-reset.css';
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 
 /*
   The CSS in this style tag is based off of Bear Blog's default CSS.
@@ -11,7 +12,7 @@ html {
 
 body {
   font-size: 1.6rem;
-  font-family: Verdana, sans-serif;
+  font-family: 'Roboto', sans-serif;
   text-align: left;
   background-color: #eee;
   word-wrap: break-word;
@@ -109,8 +110,32 @@ main {
 table {
   background: hsl(0, 0%, 100%);
   border-collapse: collapse;
+  font-size: 0.8em;
   tr:nth-child(odd) {
     background-color: hsl(0, 0%, 97%);
     padding: 0.2em;
   }
+  td {
+    padding: 0.2em;
+    &.ellipsis {
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      width: 80px;
+      @media screen and (width >= 600px) {
+        width: unset;
+      }
+    }
+  }
+  @media screen and (width >= 600px) {
+    font-size: unset;
+  }
+}
+
+a[href^='tel'] {
+  text-decoration: none;
+  color: initial;
 }

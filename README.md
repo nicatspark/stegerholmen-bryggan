@@ -2,6 +2,7 @@
 
 [Google sheet read explanation](https://www.youtube.com/watch?v=aP2cM7EuLeo)
 [How to update Google sheet](https://www.youtube.com/watch?v=ZPo4QW3QKfk)
+[How to get a specific sheet](https://ai2.metricrat.co.uk/guides/use-gviz-to-get-and-query-google-sheet-data)
 
 ![blog](https://user-images.githubusercontent.com/4677417/186189140-4ef17aac-c3c9-4918-a8c2-ce86ba1bb394.png)
 

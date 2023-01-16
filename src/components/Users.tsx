@@ -31,39 +31,62 @@ export const Users = () => {
     console.log('normalized data', normalizedData)
   }, [data])
 
-  if (isLoading) return <div>Loading spreadsheet...</div>
+  if (isLoading)
+    return (
+      <>
+        <h2>Clients</h2>
+        <div>Loading spreadsheet...</div>
+      </>
+    )
   return (
-    <div>
-      <table>
-        <tbody>
-          <tr>
-            <th>Nr</th>
-            <th>Name</th>
-            <th>Tel</th>
-            <th>Rent</th>
-            <th>Paid</th>
-          </tr>
-          {users?.users.map((user) => (
-            <tr key={user.batplnr}>
-              <td>{user.batplnr?.slice(1)}</td>
-              <td>
-                <a href={`mailto:${user.email}`}>
-                  {user.namn} {user.efternamn}
-                </a>
-              </td>
-              <td>{user.mobil}</td>
-              <td>{user.hyra}</td>
-              <td>
-                {parseInt(user.hyra || '') <= parseInt(user.betalt || '')
-                  ? '✅'
-                  : '❌'}
-              </td>
+    <>
+      <h2>Clients</h2>
+      <div>
+        <table>
+          <tbody>
+            <tr>
+              <th>Nr</th>
+              <th>Name</th>
+              <th>Tel</th>
+              <th>Rent</th>
+              <th>Paid</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+            {users?.users.map((user) => (
+              <tr key={user.batplnr}>
+                <td>{user.batplnr?.slice(1)}</td>
+                <td className='ellipsis'>
+                  <EmailWrap
+                    fullname={`${user.namn || ''} ${user.efternamn || ''}`}
+                    email={user.email}
+                  />
+                </td>
+                <td>
+                  <a href={`tel:${user.mobil}`}>{user.mobil}</a>
+                </td>
+                <td>{user.hyra}</td>
+                <td>
+                  {parseInt(user.hyra || '') <= parseInt(user.betalt || '')
+                    ? '✅'
+                    : '❌'}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
   )
 }
 
 /* --------------------------------- */
+
+function EmailWrap({
+  fullname,
+  email,
+}: {
+  fullname: string
+  email: string | undefined | null
+}) {
+  if (!email || email.trim() === '') return <>{fullname}</>
+  return <a href={`mailto:${email}`}>{fullname}</a>
+}
