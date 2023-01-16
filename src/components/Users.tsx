@@ -11,40 +11,17 @@ import {
   GoogleSheet,
   NormalizedData,
 } from '../helpers/normalizeData'
+import { getUsers } from '../assets/api/api'
 
-// https://docs.google.com/spreadsheets/d/16yvhnB75FaIQeGL6Su2317ub2EbF-XondlGCzqTg06I/edit?usp=sharing
-const fetchSheetUrl =
-  'https://docs.google.com/spreadsheets/d/16yvhnB75FaIQeGL6Su2317ub2EbF-XondlGCzqTg06I/gviz/tq?'
-const query = encodeURIComponent('Select A,B,C,D,E,H limit 17')
-
-const regex = /[^\{]+(.+)[^\{]+/
-
-const getUsers = (): Promise<void | GoogleSheet> =>
-  fetch(`${fetchSheetUrl}&tq=${query}`)
-    .then((res) => res.text())
-    .then((res) => {
-      const stripGarbage = res.match(regex)
-      if (!stripGarbage)
-        throw new Error('Could not convert spreadsheet to JSON')
-      return JSON.parse(stripGarbage[1].slice(0, -1))
-    })
-const queryClient = new QueryClient()
-
-export const App = () => {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <Users />
-    </QueryClientProvider>
-  )
-}
+const query: string = encodeURIComponent('Select A,B,C,D,E,H,J limit 17')
+const sheet = 0
 
 export const Users = () => {
   const [users, setUsers] = useState<NormalizedData | undefined>()
-  const queryClient = useQueryClient()
 
   const { data, isLoading } = useQuery({
-    queryKey: ['Users'],
-    queryFn: getUsers,
+    queryKey: ['Users', query, sheet],
+    queryFn: () => getUsers(query, sheet.toString()),
   })
 
   useEffect(() => {
@@ -64,10 +41,11 @@ export const Users = () => {
             <th>Name</th>
             <th>Tel</th>
             <th>Rent</th>
+            <th>Paid</th>
           </tr>
           {users?.users.map((user) => (
             <tr key={user.batplnr}>
-              <td>{user.batplnr}</td>
+              <td>{user.batplnr?.slice(1)}</td>
               <td>
                 <a href={`mailto:${user.email}`}>
                   {user.namn} {user.efternamn}
@@ -75,6 +53,11 @@ export const Users = () => {
               </td>
               <td>{user.mobil}</td>
               <td>{user.hyra}</td>
+              <td>
+                {parseInt(user.hyra || '') <= parseInt(user.betalt || '')
+                  ? '✅'
+                  : '❌'}
+              </td>
             </tr>
           ))}
         </tbody>

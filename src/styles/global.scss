@@ -105,3 +105,12 @@ main {
     var(--main-padding);
   background-color: #fff;
 }
+
+table {
+  background: hsl(0, 0%, 100%);
+  border-collapse: collapse;
+  tr:nth-child(odd) {
+    background-color: hsl(0, 0%, 97%);
+    padding: 0.2em;
+  }
+}

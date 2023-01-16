@@ -1,3 +1,5 @@
+import { toCurrency } from './toCurrency'
+
 export interface GoogleSheet {
   version: string
   reqId: string
@@ -28,6 +30,8 @@ export interface Col {
   pattern?: string
 }
 
+/* -------------------------- */
+
 export interface NormalizedData {
   colHeader: string[]
   users: User[]
@@ -39,8 +43,11 @@ interface User {
   efternamn?: string
   email?: string
   mobil?: string
-  hyra?: number
+  hyra?: string
+  betalt?: string
 }
+
+/* -------------------------- */
 
 export function normalizeData(data: GoogleSheet): NormalizedData {
   let colHeader: string[] = []
@@ -93,18 +100,4 @@ export function normalizeData(data: GoogleSheet): NormalizedData {
     const data = d.f?.includes('kr') ? toCurrency(d.v, 'SEK') : d.v
     return data
   }
-}
-
-const toCurrency = <T extends unknown>(
-  n: T,
-  curr: string,
-  LanguageFormat = undefined
-): T | string => {
-  if (typeof n === 'number' && isFinite(n)) {
-    return Intl.NumberFormat(LanguageFormat, {
-      style: 'currency',
-      currency: curr,
-    }).format(n)
-  }
-  return n
 }
