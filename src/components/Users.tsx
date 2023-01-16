@@ -24,7 +24,7 @@ const toCurrency = <T extends unknown>(
 // https://docs.google.com/spreadsheets/d/16yvhnB75FaIQeGL6Su2317ub2EbF-XondlGCzqTg06I/edit?usp=sharing
 const fetchSheetUrl =
   'https://docs.google.com/spreadsheets/d/16yvhnB75FaIQeGL6Su2317ub2EbF-XondlGCzqTg06I/gviz/tq?'
-const query = encodeURIComponent('Select A,B,C,D,E,H')
+const query = encodeURIComponent('Select A,B,C,D,E,H limit 17')
 
 const regex = /[^\{]+(.+)[^\{]+/
 const getUsers = (): Promise<void | RootObject> =>
@@ -48,20 +48,13 @@ export const App = () => {
 
 export const Users = () => {
   const queryClient = useQueryClient()
-  const [spots, setSpots] = useState<Row[]>([])
 
   const { data, isLoading } = useQuery({
     queryKey: ['Users'],
     queryFn: getUsers,
   })
 
-  useEffect(() => {
-    if (!data) return
-    // console.log('data', data)
-    setSpots(data.table.rows.slice(0, 17))
-  }, [data])
-
-  if (isLoading || spots.length === 0) return <div>Loading spreadsheet...</div>
+  if (isLoading) return <div>Loading spreadsheet...</div>
   return (
     <div>
       <table>
@@ -71,7 +64,7 @@ export const Users = () => {
               <th key={i}>{header.label}</th>
             ))}
           </tr>
-          {spots.map((row, y) => (
+          {data?.table.rows.map((row, y) => (
             <tr key={y}>
               {row.c?.map((rowC, g) => (
                 <td key={g}>{toCurrency(rowC?.v || '', 'SEK')}</td>
