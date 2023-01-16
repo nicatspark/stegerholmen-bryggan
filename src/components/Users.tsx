@@ -1,16 +1,6 @@
 import { useEffect, useState } from 'react'
-import {
-  useQuery,
-  // useMutation,
-  useQueryClient,
-  QueryClient,
-  QueryClientProvider,
-} from '@tanstack/react-query'
-import {
-  normalizeData,
-  GoogleSheet,
-  NormalizedData,
-} from '../helpers/normalizeData'
+import { useQuery } from '@tanstack/react-query'
+import { normalizeData } from '../helpers/normalizeData'
 import { getUsers } from '../assets/api/api'
 
 const query: string = encodeURIComponent('Select A,B,C,D,E,H,J limit 17')
@@ -26,7 +16,7 @@ export const Users = () => {
 
   useEffect(() => {
     if (!data) return
-    const normalizedData = normalizeData(data)
+    const normalizedData = normalizeData(data) as NormalizedData
     setUsers(normalizedData)
     console.log('normalized data', normalizedData)
   }, [data])
@@ -51,7 +41,7 @@ export const Users = () => {
               <th>Rent</th>
               <th>Paid</th>
             </tr>
-            {users?.users.map((user) => (
+            {users?.rows.map((user) => (
               <tr key={user.batplnr}>
                 <td>{user.batplnr?.slice(1)}</td>
                 <td className='ellipsis'>
@@ -89,4 +79,19 @@ function EmailWrap({
 }) {
   if (!email || email.trim() === '') return <>{fullname}</>
   return <a href={`mailto:${email}`}>{fullname}</a>
+}
+
+interface NormalizedData {
+  colHeader: string[]
+  rows: Rows[]
+}
+
+interface Rows {
+  batplnr?: string
+  namn?: string
+  efternamn?: string
+  email?: string
+  mobil?: string
+  hyra?: string
+  betalt?: string
 }

@@ -34,17 +34,7 @@ export interface Col {
 
 export interface NormalizedData {
   colHeader: string[]
-  users: User[]
-}
-
-interface User {
-  batplnr?: string
-  namn?: string
-  efternamn?: string
-  email?: string
-  mobil?: string
-  hyra?: string
-  betalt?: string
+  rows: unknown[]
 }
 
 /* -------------------------- */
@@ -53,17 +43,17 @@ export function normalizeData(data: GoogleSheet): NormalizedData {
   let colHeader: string[] = []
   const rootUsers = {
     colHeader,
-    users: data.table.rows.map((row) => {
-      let user: User = {}
+    rows: data.table.rows.map((row) => {
+      let rows: Record<string, unknown> = {}
       data.table.cols.forEach((header, i) => {
         const safeHeader = makeSafe(header.label)
         if (!colHeader.includes(safeHeader)) colHeader.push(safeHeader)
         const newColData = {
           [safeHeader]: treatData(row.c && row.c[i]),
         }
-        user = { ...user, ...newColData }
+        rows = { ...rows, ...newColData }
       })
-      return user
+      return rows
     }),
   }
   rootUsers.colHeader = colHeader
