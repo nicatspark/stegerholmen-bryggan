@@ -10,11 +10,40 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../config'
 <html lang='en'>
   <head>
     <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+    <script src='https://www.google.com/recaptcha/api.js'></script>
   </head>
   <body>
     <Header title={SITE_TITLE} />
     <main>
       <App client:load />
+
+      <button
+        class='g-recaptcha'
+        data-sitekey='6Ldr9TMkAAAAABQ38Pl0gei4uLUUwVL3739U8Ps6'
+        data-callback='onSubmit'
+        data-action='submit'
+      >
+        Click me to verify the captcha challenge!
+      </button>
+
+      <script is:inline>
+        function onSubmit(token) {
+          fetch('/recaptcha', {
+            method: 'POST',
+            body: JSON.stringify({ recaptcha: token }),
+          })
+            .then((response) => response.json())
+            .then((gResponse) => {
+              if (gResponse.success) {
+                // Captcha verification was a success
+                console.log('success', gResponse)
+              } else {
+                // Captcha verification failed
+                console.log('fail')
+              }
+            })
+        }
+      </script>
     </main>
     <Footer />
   </body></html
